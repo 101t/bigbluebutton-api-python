@@ -9,8 +9,6 @@ else:
 
 from .meta import MetaParameters
 import base64
-from lxml import objectify
-from xml.etree import ElementTree as ET
 
 class CreateMeetingParameters(MetaParameters):
 	def __init__(self, meetingId, meetingName):
@@ -52,36 +50,36 @@ class CreateMeetingParameters(MetaParameters):
 		self.presentations[nameOrUrl] = base64.b64encode(bytes(content, "utf-8")) if content else b""
 	def getPresentationsAsXML(self):
 		result = ""
-		if self.presentations:
-			xml = ET.Element("modules")
-			module = ET.SubElement(xml, "module")
-			module.set("name", "presentation")
-			for nameOrUrl, content in self.presentations:
-				if self.presentations[nameOrUrl] == True:
-					ET.SubElement(module, "document").set("url", urlencode(nameOrUrl))
-				else:
-					document = ET.SubElement(module, "document")
-					document.set("name", nameOrUrl)
-					document[0] = content
-			result = ET.tostring(xml, pretty_print=True)
+		# if self.presentations:
+		# 	xml = ET.Element("modules")
+		# 	module = ET.SubElement(xml, "module")
+		# 	module.set("name", "presentation")
+		# 	for nameOrUrl, content in self.presentations:
+		# 		if self.presentations[nameOrUrl] == True:
+		# 			ET.SubElement(module, "document").set("url", urlencode(nameOrUrl))
+		# 		else:
+		# 			document = ET.SubElement(module, "document")
+		# 			document.set("name", nameOrUrl)
+		# 			document[0] = content
+		# 	result = ET.tostring(xml, pretty_print=True)
 		return result
 	def getHTTPQuery(self):
 		queries = {
 			'name'                    : self.meetingName,
-            'meetingID'               : self.meetingId,
-            'attendeePW'              : self.attendeePassword,
-            'moderatorPW'             : self.moderatorPassword,
-            'dialNumber'              : self.dialNumber,
-            'voiceBridge'             : self.voiceBridge,
-            'webVoice'                : self.webVoice,
-            'logoutURL'               : self.logoutUrl,
-            'record'                  : 'true' if self.record else 'false',
-            'duration'                : self.duration,
-            'maxParticipants'         : self.maxParticipants,
-            'autoStartRecording'      : 'true' if self.autoStartRecording else 'false',
-            'allowStartStopRecording' : 'true' if self.allowStartStopRecording else 'false',
-            'welcome'                 : self.welcomeMessage.strip(),
-            'moderatorOnlyMessage'    : self.moderatorOnlyMessage.strip(),
+            'meetingID'               : self.meetingId
+            # 'attendeePW'              : self.attendeePassword,
+            # 'moderatorPW'             : self.moderatorPassword,
+            # 'dialNumber'              : self.dialNumber,
+            # 'voiceBridge'             : self.voiceBridge,
+            # 'webVoice'                : self.webVoice,
+            # 'logoutURL'               : self.logoutUrl,
+            # 'record'                  : 'true' if self.record else 'false',
+            # 'duration'                : self.duration,
+            # 'maxParticipants'         : self.maxParticipants,
+            # 'autoStartRecording'      : 'true' if self.autoStartRecording else 'false',
+            # 'allowStartStopRecording' : 'true' if self.allowStartStopRecording else 'false',
+            # 'welcome'                 : self.welcomeMessage.strip(),
+            # 'moderatorOnlyMessage'    : self.moderatorOnlyMessage.strip(),
 		}
 		self.buildMeta(queries)
 		return self.buildHTTPQuery(queries)

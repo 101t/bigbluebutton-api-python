@@ -1,6 +1,6 @@
 from .base import BaseResponse
-from ..core.meetinginfo import MeetingInfo
-from ..core.attendee import Attendee
+from core.meetinginfo import MeetingInfo
+from core.attendee import Attendee
 
 class GetMeetingInfoResponse(BaseResponse):
 	def __init__(self):

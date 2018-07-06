@@ -6,10 +6,10 @@ class MetaParameters(BaseParameters):
 	@property
 	def getMeta(self, key):
 		return self.meta[key]
-	@meta.setter
+	# @meta.setter
 	def addMeta(self, key, value):
 		self.meta[key] = value
-	def buildMeta(*queries):
+	def buildMeta(self, *queries):
 		if len(self.meta) > 0:
 			for key, value in self.meta.items():
 				queries['meta_{}'.format(key)] = value

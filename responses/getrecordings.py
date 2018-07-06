@@ -1,5 +1,5 @@
 from .base import BaseResponse
-from ..core.record import Record
+from core.record import Record
 
 class GetRecordingsResponse(BaseResponse):
 	def __init__(self):

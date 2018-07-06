@@ -8,8 +8,9 @@ class GetRecordingsParameters(MetaParameters):
 		self.state = ""
 	def getHTTPQuery(self):
 		queries = {
-			"meetingID": self.meetingID
-			"recordID": self.recordID
+			"meetingID": self.meetingID,
+			"recordID": self.recordID,
+			"recordID": self.recordID,
 			"state": self.state
 		}
 		self.buildMeta(queries)

@@ -22,6 +22,6 @@ class SetConfigXMLParameters(BaseParameters):
 
 	def getHTTPQuery(self):
 		return self.buildHTTPQuery({
-				"configXML": urlencode(ET.tostring(self.rawXml, pretty_print=True))
+				"configXML": urlencode(ET.tostring(self.rawXml, pretty_print=True)),
 				"meetingID": self.meetingID
 			})

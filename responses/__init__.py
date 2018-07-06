@@ -1,5 +1,5 @@
 
-from .apiversion import ApiVersion
+from .apiversion import ApiVersionResponse
 from .createmeeting import CreateMeetingResponse
 from .deleterecordings import DeleteRecordingsResponse
 from .endmeeting import EndMeetingResponse
