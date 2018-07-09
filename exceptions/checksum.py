@@ -1,3 +1,0 @@
-
-class ChecksumException(Exception):
-	pass

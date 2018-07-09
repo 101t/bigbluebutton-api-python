@@ -1,11 +1,12 @@
 from .base import BaseResponse
 from core.record import Record
 
+
 class GetRecordingsResponse(BaseResponse):
-	def __init__(self):
-		self.records = []
-	def getRecords(self):
-		if not self.records:
-			for recordXml in self.rawXml.recordings.xpath(".//*"):
-				self.records.append(recordXml)
-		return self.records
+
+    def get_recordings(self):
+        recordings = []
+        for recordXml in self.rawXml.recordings.getchildren():
+            recordings.append(Record(recordXml))
+
+        return recordings

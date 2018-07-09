@@ -1,5 +1,5 @@
 from .base import BaseResponse
 
 class PublishRecordingsResponse(BaseResponse):
-	def isPublished(self):
-		return self.rawXml.published == "true"
+    def is_published(self):
+        return self.get_text("published") == "true" or self.get_text("published")

@@ -1,258 +1,148 @@
-
 from core import ApiMethod
 from responses import (
-	ApiVersionResponse,
-	CreateMeetingResponse,
-	DeleteRecordingsResponse,
-	EndMeetingResponse,
-	GetDefaultConfigXMLResponse,
-	GetMeetingInfoResponse,
-	GetMeetingsResponse,
-	GetRecordingsResponse,
-	IsMeetingRunningResponse,
-	JoinMeetingResponse,
-	PublishRecordingsResponse,
-	SetConfigXMLResponse,
-	UpdateRecordingsResponse,
+    ApiVersionResponse,
+    CreateMeetingResponse,
+    DeleteRecordingsResponse,
+    EndMeetingResponse,
+    GetDefaultConfigXMLResponse,
+    GetMeetingInfoResponse,
+    GetMeetingsResponse,
+    GetRecordingsResponse,
+    IsMeetingRunningResponse,
+    PublishRecordingsResponse,
+    SetConfigXMLResponse,
+    UpdateRecordingsResponse,
 )
+from exception import BBBException
 from util import UrlBuilder
 from xml.etree import ElementTree as ET
-import requests, re
+from lxml import objectify, etree
 import sys
+from hashlib import sha1
+
 if sys.version_info[0] == 2:
-	from urllib2 import Request
-	from urllib import urlencode, urlopen
+    from urllib2 import Request
+    from urllib import urlencode, urlopen
+    from urllib import quote
 else:
-	from urllib.request import urlopen, Request
-	from urllib.parse import urlencode
+    from urllib.request import urlopen, Request
+    from urllib.parse import urlencode
+    from urllib.request import quote
 
 
 class BigBlueButton:
 
-	def __init__(self, bbbServerBaseUrl, securitySalt):
-		self.__urlBuilder = UrlBuilder(bbbServerBaseUrl, securitySalt)
+    def __init__(self, bbbServerBaseUrl, securitySalt):
+        self.__urlBuilder = UrlBuilder(bbbServerBaseUrl, securitySalt)
 
-	def get_api_version(self):
-		response = self.__send_api_request(ApiMethod.VERSION)
-		return response.find("version").text
+    def get_api_version(self):
+        response = self.__send_api_request(ApiMethod.VERSION)
+        return ApiVersionResponse(response)
 
-	def create_meeting(self, meeting_id, params={}):
-		params["meetingID"] = meeting_id
-		response = self.__send_api_request(ApiMethod.CREATE, params)
-		return response
+    def create_meeting(self, meeting_id, params={}, meta={}, slides=[]):
+        params["meetingID"] = meeting_id
+        response = self.__send_api_request(ApiMethod.CREATE, params)
+        if meta != {}:
+            for key, val in meta.items():
+                params["meta_" + key] = val
+        assert slides == []
 
-	def get_join_meeting_url(self, full_name, meeting_id, password, params={}):
-		params["fullName"] = full_name
-		params["meetingID"] = meeting_id
-		params["password"] = password
-		response = self.__format_url(ApiMethod.JOIN, params)
-		return response
+        return CreateMeetingResponse(response)
 
-	def is_meeting_running(self, meeting_id):
-		params = {"meetingID": meeting_id}
-		response = self.__send_api_request(ApiMethod.IS_MEETING_RUNNING, params)
-		return True if response.find("running").text == "true" else False
+    def get_join_meeting_url(self, full_name, meeting_id, password, params={}):
+        params["fullName"] = full_name
+        params["meetingID"] = meeting_id
+        params["password"] = password
+        response = self.__urlBuilder.buildUrl(ApiMethod.JOIN, params)
+        return response
 
-	def end_meeting(self, meeting_id, password):
-		params = {"meetingID": meeting_id, "password": password}
-		response = self.__send_api_request(ApiMethod.END, params)
-		return True if response.find("returncode").text == "SUCCESS" else False
+    def is_meeting_running(self, meeting_id):
+        params = {"meetingID": meeting_id}
+        response = self.__send_api_request(ApiMethod.IS_MEETING_RUNNING, params)
+        return IsMeetingRunningResponse(response)
 
-	# TO DO
-	def get_meeting_info(self):
-		pass
+    def end_meeting(self, meeting_id, password):
+        params = {"meetingID": meeting_id, "password": password}
+        response = self.__send_api_request(ApiMethod.END, params)
+        return EndMeetingResponse(response)
 
-	# TO DO
-	def get_meetings(self):
-		pass
+    def get_meeting_info(self, meeting_id):
+        params = {"meetingID": meeting_id}
+        response = self.__send_api_request(ApiMethod.GET_MEETING_INFO, params)
+        return GetMeetingInfoResponse(response)
 
-	# TO DO
-	def get_recordings(self):
-		pass
+    def get_meetings(self):
+        response = self.__send_api_request(ApiMethod.GET_MEETINGS)
+        return GetMeetingsResponse(response)
 
-	# TO DO
-	def publish_recordings(self):
-		pass
+    def get_recordings(self, meeting_id=None, recording_id=None, states=None, meta=None):
+        if states:
+            for state in states:
+                if state not in ["processing", "processed", "published", "unpublished", "deleted"]:
+                    raise BBBException("invalidRecordingState", "Invalid recording state given.")
+        params = {"meetingID": meeting_id, "recordID": recording_id}
+        if meta:
+            for key, val in meta.items():
+                params["meta_" + key] = val
 
-	# TO DO
-	def delete_recordings(self):
-		pass
+        response = self.__send_api_request(ApiMethod.GET_RECORDINGS, params)
+        return GetRecordingsResponse(response)
 
-	# TO DO
-	def update_recordings(self):
-		pass
+    def publish_recordings(self, recording_id, publish=True):
+        params = {"recordID": recording_id, "publish": "true" if publish else "false"}
+        response = self.__send_api_request(ApiMethod.PUBLISH_RECORDINGS, params)
+        return PublishRecordingsResponse(response)
 
-	# get default config.xml, if file_path is not given, this function will return response
-	# as ElementTree.Element, otherwise it saves the response to the specific file path
-	def get_default_config_xml(self, file_path=None):
-		response = self.__send_api_request(ApiMethod.GET_DEFAULT_CONFIG_XML)
-		if file_path is None:
-			return response
-		else:
-			with open(file_path, 'w') as file:
-				file.write(ET.tostring(response).decode())
+    def delete_recordings(self, recording_id):
+        params = {"recordID": recording_id}
+        response = self.__send_api_request(ApiMethod.DELETE_RECORDINGS, params)
+        return DeleteRecordingsResponse(response)
 
-	# TO DO
-	def set_config_xml(self, meeting_id, xml):
-		pass
+    def update_recordings(self, recording_id, meta={}):
+        params = {"recordID": recording_id}
+        if meta != {}:
+            for key, val in meta.items():
+                params["meta_" + key] = val
+        response = self.__send_api_request(ApiMethod.UPDATE_RECORDINGS, params)
+        return UpdateRecordingsResponse(response)
 
+    # get default config.xml, if file_path is not given, this function will return response
+    # as ElementTree.Element, otherwise it saves the response to the specific file path
+    def get_default_config_xml(self, file_path=None):
+        response = self.__send_api_request(ApiMethod.GET_DEFAULT_CONFIG_XML)
+        if file_path is None:
+            return response
+        else:
+            with open(file_path, 'w') as f:
+                f.write(etree.tostring(response).decode('utf-8'))
 
-	def __send_api_request(self, api_call, params={}, data=None):
-		url = self.__urlBuilder.buildUrl(api_call, params)
+    def set_config_xml(self, meeting_id, xml):
+        secret = "configXML=" + quote(xml)
+        secret += "&meetingID=" + meeting_id
+        secret += self.__urlBuilder.securitySalt
+        securityStr = sha1(secret.encode('utf-8')).hexdigest()
 
-		# if data is none, then we send a GET request, if not, then we send a POST request
-		if data is None:
-			response = urlopen(url).read()
-		else:
-			request = Request(url, urlencode(data).encode())
-			response = urlopen(request).read()
+        return self.__send_api_request(ApiMethod.SET_CONFIG_XML, data={"checksum": securityStr,
+                                                                       "configXML": quote(xml),
+                                                                       "meetingID": meeting_id})
 
-		tree = ET.fromstring(response)
+    def __send_api_request(self, api_call, params={}, data=None):
+        url = self.__urlBuilder.buildUrl(api_call, params)
 
-		# get default config xml request will simply return the xml file without
-		# returncode, so it will cause an error when try to check the return code
-		if api_call != ApiMethod.GET_DEFAULT_CONFIG_XML:
-			if tree.find("returncode").text == "FAILED":
-				raise BBBException(tree.find("messageKey").text,
-								   tree.find("message").text)
+        # if data is none, then we send a GET request, if not, then we send a POST request
+        if data is None:
+            response = urlopen(url).read()
+        else:
+            request = Request(url, data=urlencode(data).encode())
+            response = urlopen(request).read()
 
-		return tree
+        rawXml = objectify.fromstring(response)
 
+        # get default config xml request will simply return the xml file without
+        # returncode, so it will cause an error when try to check the return code
+        if api_call != ApiMethod.GET_DEFAULT_CONFIG_XML:
+            if rawXml["returncode"] == "FAILED":
+                raise BBBException(rawXml["messageKey"],
+                                   rawXml["message"])
 
-
-	'''
-	seperate
-	'''
-
-
-	def getApiVersion(self):
-		''' 
-		returns: 
-			ApiVersionResponse
-		'''
-		xml = self.processXmlResponse(self.urlBuilder.buildUrl())
-		return ApiVersionResponse(xml)
-	'''
-	__________________ BBB ADMINISTRATION METHODS _________________
-
-	The methods in the following section support the following categories of the BBB API:
-    -- create
-    -- getDefaultConfigXML
-    -- join
-    -- end
-
-	'''
-
-	def getCreateMeetingUrl(self, createMeetingParams):
-		return self.urlBuilder.buildUrl(ApiMethod.CREATE, createMeetingParams.getHTTPQuery())
-	def createMeeting(self, createMeetingParams):
-		xml = self.processXmlResponse(self.getCreateMeetingUrl(createMeetingParams), createMeetingParams.getPresentationsAsXML())
-		return CreateMeetingResponse(xml)
-	
-	def getDefaultConfigXMLUrl(self):
-		return self.urlBuilder.buildUrl(ApiMethod.GET_DEFAULT_CONFIG_XML)
-	def getDefaultConfigXML(self):
-		xml = self.processXmlResponse(self.getDefaultConfigXMLUrl())
-		return GetDefaultConfigXMLResponse(xml)
-	
-	def setConfigXMLUrl(self):
-		return self.urlBuilder.buildUrl(ApiMethod.SET_CONFIG_XML, "", False)
-	def setConfigXML(self, setConfigXMLParams):
-		setConfigXMLPayload = self.urlBuilder.buildQs(ApiMethod.SET_CONFIG_XML, setConfigXMLParams.getHTTPQuery())
-		xml = self.processXmlResponse(self.setConfigXMLUrl(), setConfigXMLPayload, "application/x-www-form-urlencoded")
-		return SetConfigXMLResponse(xml)
-
-	def getJoinMeetingURL(self, joinMeetingParams):
-		return self.urlBuilder.buildUrl(ApiMethod.JOIN, joinMeetingParams.getHTTPQuery())
-	def joinMeeting(self, joinMeetingParams):
-		xml = self.processXmlResponse(self.getJoinMeetingURL(joinMeetingParams))
-		return JoinMeetingResponse(xml)
-
-	def getEndMeetingURL(self, endParams):
-		return self.urlBuilder.buildUrl(ApiMethod.END, endParams.getHTTPQuery())
-	def endMeeting(self, endParams):
-		xml = self.processXmlResponse(self.getEndMeetingURL(endParams))
-		return EndMeetingResponse(xml)
-	
-	'''
-	__________________ BBB MONITORING METHODS _________________ 
-
-	The methods in the following section support the following categories of the BBB API:
-    -- isMeetingRunning
-    -- getMeetings
-    -- getMeetingInfo
-
-	'''
-
-	def getIsMeetingRunningUrl(self, meetingParams):
-		return self.urlBuilder.buildUrl(ApiMethod.IS_MEETING_RUNNING, meetingParams.getHTTPQuery())
-	def isMeetingRunning(self, meetingParams):
-		xml = self.processXmlResponse(self.getIsMeetingRunningUrl(meetingParams))
-		return IsMeetingRunningResponse(xml)
-
-	def getMeetingsUrl(self):
-		return self.urlBuilder.buildUrl(ApiMethod.GET_MEETINGS)
-	def getMeetings(self):
-		xml = self.processXmlResponse(self.getMeetingsUrl())
-		return GetMeetingsResponse(xml)
-
-	def getMeetingInfoUrl(self, meetingParams):
-		return self.urlBuilder.buildUrl(ApiMethod.GET_MEETING_INFO, meetingParams.getHTTPQuery())
-	def getMeetingInfo(self, meetingParams):
-		xml = self.processXmlResponse(self.getMeetingInfoUrl(meetingParams))
-		return GetMeetingInfoResponse(xml)
-	'''
-	__________________ BBB RECORDING METHODS _________________
-
-	The methods in the following section support the following categories of the BBB API:
-    -- getRecordings
-    -- publishRecordings
-    -- deleteRecordings
-
-	'''
-	def getRecordingsUrl(self, recordingsParams):
-		return self.urlBuilder.buildUrl(ApiMethod.GET_RECORDINGS, recordingsParams.getHTTPQuery())
-	def getRecordings(self, recordingsParams):
-		xml = self.processXmlResponse(self.getRecordingsUrl(recordingsParams))
-		return GetRecordingsResponse(xml)
-	def getPublishRecordingsUrl(self, recordingParams):
-		return self.urlBuilder.buildUrl(ApiMethod.PUBLISH_RECORDINGS, recordingParams.getHTTPQuery())
-	def publishRecordings(self, recordingParams):
-		xml = self.processXmlResponse(self.getPublishRecordingsUrl(recordingParams))
-		return PublishRecordingsResponse(xml)
-	def getDeleteRecordingsUrl(self, recordingParams):
-		return self.urlBuilder.buildUrl(ApiMethod.DELETE_RECORDINGS, recordingParams.getHTTPQuery())
-	def deleteRecordings(self, recordingParams):
-		xml = self.processXmlResponse(self.getDeleteRecordingsUrl(recordingParams))
-		return DeleteRecordingsResponse(xml)
-	def getUpdateRecordingsUrl(self, recordingParams):
-		return self.urlBuilder.buildUrl(ApiMethod.UPDATE_RECORDINGS, recordingParams.getHTTPQuery())
-	def updateRecordings(self, recordingParams):
-		xml = self.processXmlResponse(self.getUpdateRecordingsUrl(recordingParams))
-		return UpdateRecordingsResponse(xml)
-	'''
-	____________________ INTERNAL CLASS METHODS ___________________
-
-	A private utility method used by other public methods to process XML responses.
-	Args:
-		url (str)
-		payload (str)
-	Returns:
-		ElementTree
-
-	'''
-
-
-	def processXmlResponse(self, url, payload = "", contentType = "application/xml"):
-		host = re.sub(re.compile(r"http(s?)\:\/\/"), "", self.bbbServerBaseUrl)
-		# url = "{}{}".format(self.schema, host)
-		headers = {
-			"Host": host,
-			"Content-Type": contentType,
-			"Content-Length": str(len(payload)),
-		}
-		# response = requests.post(url, headers=headers, data=payload, verify=False)
-		response = requests.get(url)
-
-		return objectify.fromstring(response.text) if response.status_code == 200 else None
-
+        return rawXml

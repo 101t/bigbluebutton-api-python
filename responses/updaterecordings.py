@@ -1,5 +1,5 @@
 from .base import BaseResponse
 
 class UpdateRecordingsResponse(BaseResponse):
-	def isUpdated(self):
-		return self.rawXml.updated == "true"
+    def is_updated(self):
+        return self.get_text("updated") == "true" or self.get_text("updated")

@@ -1,47 +1,66 @@
+from .metaData import MetaData
 
+class Meeting(object):
+    def __init__(self, xml):
+        self.__meetingId = xml.meetingID
+        self.__meetingName = xml.meetingName
+        self.__creationTime = float(xml.createTime)
+        self.__creationDate = xml.createDate
+        self.__voiceBridge = xml.voiceBridge
+        self.__dialNumber = xml.dialNumber
+        self.__attendeePassword = xml.attendeePW
+        self.__moderatorPassword = xml.moderatorPW
+        self.__hasBeenForciblyEnded = xml.hasBeenForciblyEnded == 'true' or xml.hasBeenForciblyEnded
+        self.__isRunning = xml.running == 'true'
+        self.__participantCount = int(xml.participantCount)
+        self.__listenerCount = int(xml.listenerCount)
+        self.__voiceParticipantCount = int(xml.voiceParticipantCount)
+        self.__videoCount = int(xml.videoCount)
+        self.__duration = int(xml.duration)
+        self.__hasUserJoined = xml.hasUserJoined == 'true' or xml.hasUserJoined
+        self.__meta = MetaData(xml.metadata)
 
-class Meeting:
-	def __init__(self, xml):
-		self.meetingID				= xml.meetingID
-		self.meetingName			= xml.meetingName
-		self.creationTime			= float(xml.createTime)
-		self.creationDate			= xml.createDate
-		self.voiceBridge			= xml.voiceBridge
-		self.dialNumber				= int(xml.dialNumber)
-		self.attendeePassword		= xml.attendeePW
-		self.moderatorPassword		= xml.moderatorPW
-		self.hasBeenForciblyEnded	= xml.hasBeenForciblyEnded == 'true'
-		self.isRunning				= xml.running == 'true'
-		self.participantCount		= int(xml.participantCount)
-		self.listenerCount			= int(xml.listenerCount)
-		self.voiceParticipantCount	= int(xml.voiceParticipantCount)
-		self.videoCount				= int(xml.videoCount)
-		self.duration				= int(xml.duration)
-		self.hasUserJoined			= xml.hasUserJoined == 'true'
+    def get_meetingid(self):
+        return self.__meetingId
 
-	def getMeetingId(self):
-		return self.meetingId
-	def getMeetingName(self):
-		return self.meetingName
-	def getCreationTime(self):
-		return self.creationTime
-	def getCreationDate(self):
-		return self.creationDate
-	def getVoiceBridge(self):
-		return self.voiceBridge
-	def getDialNumber(self):
-		return self.dialNumber
-	def getAttendeePassword(self):
-		return self.attendeePassword
-	def getModeratorPassword(self):
-		return self.moderatorPassword
-	def getParticipantCount(self):
-		return self.participantCount
-	def getListenerCount(self):
-		return self.listenerCount
-	def getVoiceParticipantCount(self):
-		return self.voiceParticipantCount
-	def getVideoCount(self):
-		return self.videoCount
-	def getDuration(self):
-		return self.duration
+    def get_meetingname(self):
+        return self.__meetingName
+
+    def get_createtime(self):
+        return self.__creationTime
+
+    def get_createdate(self):
+        return self.__creationDate
+
+    def get_voicebridge(self):
+        return self.__voiceBridge
+
+    def get_dialnumber(self):
+        return self.__dialNumber
+
+    def get_attendeepw(self):
+        return self.__attendeePassword
+
+    def get_moderatorpw(self):
+        return self.__moderatorPassword
+
+    def get_participantcount(self):
+        return self.__participantCount
+
+    def get_listenercount(self):
+        return self.__listenerCount
+
+    def get_voiceparticipantcount(self):
+        return self.__voiceParticipantCount
+
+    def get_videocount(self):
+        return self.__videoCount
+
+    def get_duration(self):
+        return self.__duration
+
+    def has_user_joined(self):
+        return self.__hasUserJoined
+
+    def has_been_forcibly_ended(self):
+        return self.__hasBeenForciblyEnded

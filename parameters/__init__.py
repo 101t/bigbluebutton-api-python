@@ -1,10 +1,1 @@
-from .createmeeting import CreateMeetingParameters
-from .deleterecordings import DeleteRecordingsParameters
-from .endmeeting import EndMeetingParameters
-from .getmeetinginfo import GetMeetingInfoParameters
-from .getrecordings import GetRecordingsParameters
-from .ismeetingrunning import IsMeetingRunningParameters
-from .joinmeeting import JoinMeetingParameters
-from .publishrecordings import PublishRecordingsParameters
-from .setconfigxml import SetConfigXMLParameters
-from .updaterecordings import UpdateRecordingsParameters
+

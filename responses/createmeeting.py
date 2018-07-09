@@ -1,24 +1,24 @@
 from .base import BaseResponse
+from datetime import datetime
 
 class CreateMeetingResponse(BaseResponse):
-	def getMeetingID(self):
-		return self.meetingID
-	def getAttendeePassword(self):
-		return self.rawXml.attendeePW
-	def getModeratorPassword(self):
-		return self.rawXml.moderatorPW
-	def getCreationTime(self):
-		return float(self.rawXml.createTime)
-	def getVoiceBridge(self):
-		return int(self.rawXml.voiceBridge)
-	def getDialNumber(self):
-		return self.rawXml.dialNumber
-	def getCreationDate(self):
-		'Creation date at the format "Sun Jan 17 18:20:07 EST 2016".'
-		return self.rawXml.createDate
-	def hasUserJoined(self):
-		return self.rawXml.hasUserJoined == "true"
-	def getDuration(self):
-		return self.rawXml.duration
-	def hasBeenForciblyEnded(self):
-		return self.rawXml.hasBeenForciblyEnded == "true"
+    def get_meetingid(self):
+        return self.get_text("meetingID")
+
+    def get_attendee_pw(self):
+        return self.get_text("attendeePW")
+
+    def get_moderator_pw(self):
+        return self.get_text("moderatorPW")
+
+    def get_create_time(self):
+        return datetime.fromtimestamp(int(self.get_text("createTime")) / 1e3).strftime('%Y-%m-%d %H:%M:%S')
+
+    def has_been_forcibly_ended(self):
+        return self.get_text("hasBeenForciblyEnded") == "true"
+
+    def get_voice_bridge(self):
+        return self.get_text("voiceBridge")
+
+    def get_dial_number(self):
+        return self.get_text("dialNumber")

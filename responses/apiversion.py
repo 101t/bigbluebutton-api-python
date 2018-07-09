@@ -1,7 +1,6 @@
-
 from .base import BaseResponse
 
+
 class ApiVersionResponse(BaseResponse):
-	def getVersion(self):
-		return self.rawXml.version
-		
+    def get_version(self):
+        return self.get_text("version")

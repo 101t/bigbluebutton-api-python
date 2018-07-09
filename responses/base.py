@@ -2,35 +2,40 @@
 
 import sys
 if sys.version_info[0] == 2:
-	"2.x"
-	from urllib import urlencode
-	from abc import ABCMeta, abstractmethod
+    from abc import ABCMeta
 
-	class BaseResponse:
-		__metaclass__ = ABCMeta
-		def __init__(self, xml):
-			self.rawXml = xml
-		def getRawXml(self):
-			return self.rawXml
-		def getReturnCode(self):
-			return self.rawXml.returncode
-		def getMessageKey(self):
-			return self.rawXml.messageKey
-		def getMessage(self):
-			return self.rawXml.message
+    class BaseResponse:
+        __metaclass__ = ABCMeta
+
+        def __init__(self, rawXml):
+            self.rawXml = rawXml
+
+        def get_text(self, label):
+            return self.rawXml[label]
+
+        def get_return_code(self):
+            return self.get_text("returncode")
+
+        def get_message_key(self):
+            return self.get_text("messageKey")
+
+        def get_message(self):
+            return self.get_text("message")
 else:
-	"3.x"
-	from urllib.parse import urlencode
-	from abc import ABC, abstractmethod
+    from abc import ABC
 
-	class BaseResponse(ABC):
-		def __init__(self, xml):
-			self.rawXml = xml
-		def getRawXml(self):
-			return self.rawXml
-		def getReturnCode(self):
-			return self.rawXml.returncode
-		def getMessageKey(self):
-			return self.rawXml.messageKey
-		def getMessage(self):
-			return self.rawXml.message
+    class BaseResponse(ABC):
+        def __init__(self, rawXml):
+            self.rawXml = rawXml
+
+        def get_text(self, label):
+            return self.rawXml[label]
+
+        def get_return_code(self):
+            return self.get_text("returncode")
+
+        def get_message_key(self):
+            return self.get_text("messageKey")
+
+        def get_message(self):
+            return self.get_text("message")
