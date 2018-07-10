@@ -13,6 +13,8 @@ class BBBException(Exception):
     CHECKSUM_ERROR = "checksumError"
     INVALID_RECORDING_STATE = "invalidRecordingState"
     CONFIG_XML_ERROR = "configXMLError"
+    XML_SYNTAX_ERROR = "XMLSyntaxError"
+
 
     def __init__(self, key, message):
         Exception.__init__(self, message)

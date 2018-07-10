@@ -4,7 +4,6 @@ from responses import (
     CreateMeetingResponse,
     DeleteRecordingsResponse,
     EndMeetingResponse,
-    GetDefaultConfigXMLResponse,
     GetMeetingInfoResponse,
     GetMeetingsResponse,
     GetRecordingsResponse,
@@ -15,17 +14,15 @@ from responses import (
 )
 from exception import BBBException
 from util import UrlBuilder
-from xml.etree import ElementTree as ET
 from lxml import objectify, etree
-import sys
 from hashlib import sha1
-
+from parameters import BBBModule
+import sys
 if sys.version_info[0] == 2:
-    from urllib2 import Request
     from urllib import urlencode, urlopen
     from urllib import quote
 else:
-    from urllib.request import urlopen, Request
+    from urllib.request import urlopen
     from urllib.parse import urlencode
     from urllib.request import quote
 
@@ -39,14 +36,15 @@ class BigBlueButton:
         response = self.__send_api_request(ApiMethod.VERSION)
         return ApiVersionResponse(response)
 
-    def create_meeting(self, meeting_id, params={}, meta={}, slides=[]):
+    def create_meeting(self, meeting_id, params={}, meta={}, slides=None):
         params["meetingID"] = meeting_id
-        response = self.__send_api_request(ApiMethod.CREATE, params)
         if meta != {}:
             for key, val in meta.items():
                 params["meta_" + key] = val
-        assert slides == []
-
+        if slides and isinstance(slides, BBBModule):
+            response = self.__send_api_request(ApiMethod.CREATE, params, slides.to_xml())
+        else:
+            response = self.__send_api_request(ApiMethod.CREATE, params)
         return CreateMeetingResponse(response)
 
     def get_join_meeting_url(self, full_name, meeting_id, password, params={}):
@@ -117,14 +115,16 @@ class BigBlueButton:
                 f.write(etree.tostring(response).decode('utf-8'))
 
     def set_config_xml(self, meeting_id, xml):
-        secret = "configXML=" + quote(xml)
+        secret = ApiMethod.SET_CONFIG_XML + "configXML=" + quote(xml)
         secret += "&meetingID=" + meeting_id
         secret += self.__urlBuilder.securitySalt
+
         securityStr = sha1(secret.encode('utf-8')).hexdigest()
 
-        return self.__send_api_request(ApiMethod.SET_CONFIG_XML, data={"checksum": securityStr,
-                                                                       "configXML": quote(xml),
-                                                                       "meetingID": meeting_id})
+        response = self.__send_api_request(ApiMethod.SET_CONFIG_XML, data={"checksum": securityStr,
+                                                                           "configXML": quote(xml),
+                                                                           "meetingID": meeting_id})
+        return SetConfigXMLResponse(response)
 
     def __send_api_request(self, api_call, params={}, data=None):
         url = self.__urlBuilder.buildUrl(api_call, params)
@@ -133,10 +133,13 @@ class BigBlueButton:
         if data is None:
             response = urlopen(url).read()
         else:
-            request = Request(url, data=urlencode(data).encode())
-            response = urlopen(request).read()
+            response = urlopen(url, data=urlencode(data).encode()).read()
 
-        rawXml = objectify.fromstring(response)
+        try:
+            print(response)
+            rawXml = objectify.fromstring(response)
+        except Exception as e:
+            raise BBBException("XMLSyntaxError", e.message)
 
         # get default config xml request will simply return the xml file without
         # returncode, so it will cause an error when try to check the return code

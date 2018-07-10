@@ -3,7 +3,6 @@ from .apiversion import ApiVersionResponse
 from .createmeeting import CreateMeetingResponse
 from .deleterecordings import DeleteRecordingsResponse
 from .endmeeting import EndMeetingResponse
-from .getdefaultconfigxml import GetDefaultConfigXMLResponse
 from .getmeetinginfo import GetMeetingInfoResponse
 from .getmeetings import GetMeetingsResponse
 from .getrecordings import GetRecordingsResponse
