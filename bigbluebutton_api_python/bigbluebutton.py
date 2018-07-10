@@ -1,5 +1,5 @@
-from core import ApiMethod
-from responses import (
+from .core import ApiMethod
+from .responses import (
     ApiVersionResponse,
     CreateMeetingResponse,
     DeleteRecordingsResponse,
@@ -12,12 +12,12 @@ from responses import (
     SetConfigXMLResponse,
     UpdateRecordingsResponse,
 )
-from exception import BBBException
-from util import UrlBuilder
+from .exception import BBBException
+from .util import UrlBuilder
+from .parameters import BBBModule
+import sys
 from lxml import objectify, etree
 from hashlib import sha1
-from parameters import BBBModule
-import sys
 if sys.version_info[0] == 2:
     from urllib import urlencode, urlopen
     from urllib import quote
