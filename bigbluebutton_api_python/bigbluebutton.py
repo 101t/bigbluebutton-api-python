@@ -136,7 +136,6 @@ class BigBlueButton:
             response = urlopen(url, data=urlencode(data).encode()).read()
 
         try:
-            print(response)
             rawXml = objectify.fromstring(response)
         except Exception as e:
             raise BBBException("XMLSyntaxError", e.message)

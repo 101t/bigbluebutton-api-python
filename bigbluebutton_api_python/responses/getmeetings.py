@@ -1,5 +1,5 @@
 from .base import BaseResponse
-from core.meeting import Meeting
+from ..core.meeting import Meeting
 
 class GetMeetingsResponse(BaseResponse):
     def get_meetings(self):

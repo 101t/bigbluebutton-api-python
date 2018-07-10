@@ -19,5 +19,3 @@ class BBBException(Exception):
     def __init__(self, key, message):
         Exception.__init__(self, message)
         self.key = key
-        print("key is " + key)
-        print("message is " + message)
