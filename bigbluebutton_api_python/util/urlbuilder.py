@@ -4,9 +4,9 @@ from re import match
 
 import sys
 if sys.version_info[0] == 2:
-    from urllib import quote
+    from urllib import quote_plus
 else:
-    from urllib.request import quote
+    from urllib.request import quote_plus
 
 
 class UrlBuilder:
@@ -15,7 +15,8 @@ class UrlBuilder:
             if not bbbServerBaseUrl.startswith("http://") and not bbbServerBaseUrl.startswith("https://"):
                 bbbServerBaseUrl = "http://" + bbbServerBaseUrl
             if not bbbServerBaseUrl.endswith("/bigbluebutton/api/"):
-                bbbServerBaseUrl = bbbServerBaseUrl[:bbbServerBaseUrl.index("/", 8)] + "/bigbluebutton/api/"
+                bbbServerBaseUrl = bbbServerBaseUrl[:(bbbServerBaseUrl.find("/", 8)
+                    if bbbServerBaseUrl.find("/", 8) != -1 else len(bbbServerBaseUrl))] + "/bigbluebutton/api/"
 
         self.securitySalt         = securitySalt
         self.bbbServerBaseUrl     = bbbServerBaseUrl
@@ -24,8 +25,11 @@ class UrlBuilder:
         url = self.bbbServerBaseUrl
         url += api_call + "?"
         for key, value in params.items():
-            if value:
-                url += key + "=" + quote(value) + "&"
+            if isinstance(value, bool):
+                value = "true" if value else "false"
+            else:
+                value = str(value)
+            url += key + "=" + quote_plus(value) + "&"
 
         url += "checksum=" + self.__get_checksum(api_call, params)
         return url
@@ -33,8 +37,11 @@ class UrlBuilder:
     def __get_checksum(self, api_call, params={}):
         secret_str = api_call
         for key, value in params.items():
-            if value:
-                secret_str += key + "=" + value + "&"
+            if isinstance(value, bool):
+                value = "true" if value else "false"
+            else:
+                value = str(value)
+            secret_str += key + "=" + quote_plus(value) + "&"
         if secret_str.endswith("&"):
             secret_str = secret_str[:-1]
         secret_str += self.securitySalt
