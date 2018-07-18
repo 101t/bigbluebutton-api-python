@@ -1,12 +1,12 @@
 class Attendee:
     def __init__(self, xml):
-        self.__userID = xml.userID
-        self.__fullName = xml.fullName
-        self.__role = xml.role
-        self.__isPresenter = xml.isPresenter == 'true' or xml.isPresenter
-        self.__isListeningOnly = xml.isListeningOnly == 'true' or xml.isListeningOnly
-        self.__hasJoinedVoice = xml.hasJoinedVoice == 'true' or xml.hasJoinedVoice
-        self.__hasVideo = xml.hasVideo == 'true' or xml.hasVideo
+        self.__userID = xml["userID"]
+        self.__fullName = xml["fullName"]
+        self.__role = xml["role"]
+        self.__isPresenter = xml["isPresenter"] == 'true'
+        self.__isListeningOnly = xml["isListeningOnly"] == 'true'
+        self.__hasJoinedVoice = xml["hasJoinedVoice"] == 'true'
+        self.__hasVideo = xml["hasVideo"] == 'true'
 
     def get_userid(self):
         return self.__userID

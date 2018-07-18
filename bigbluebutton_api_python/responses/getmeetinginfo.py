@@ -16,6 +16,16 @@ class GetMeetingInfoResponse(BaseResponse):
 
     def get_attendees(self):
         attendees = []
-        for attendeeXml in self.rawXml.attendees.getchildren():
-            attendees.append(Attendee(xml=attendeeXml))
+
+        field = self.get_field("attendees")
+        if field == "":
+            return []
+
+        obj = field["attendee"]
+        if isinstance(obj, list):
+            for attendeeXml in obj:
+                attendees.append(Attendee(xml=attendeeXml))
+        else:
+            attendees.append(Attendee(xml=obj))
+
         return attendees

@@ -73,7 +73,7 @@ class BigBlueButton:
         response = self.__send_api_request(ApiMethod.GET_MEETINGS)
         return GetMeetingsResponse(response)
 
-    def get_recordings(self, meeting_id=None, recording_id=None, states=None, meta=None):
+    def get_recordings(self, meeting_id="", recording_id="", states=None, meta=None):
         if states:
             for state in states:
                 if state not in ["processing", "processed", "published", "unpublished", "deleted"]:

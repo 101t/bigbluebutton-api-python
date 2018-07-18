@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 setup(name='bigbluebutton_api_python',
-      version='0.0.7',
+      version='0.0.9',
       description='Python library that provides access to the API of BigBlueButton',
       author='Tarek Kalaji, Yunkai Wang',
       author_email='yunkai.wang@blindsidenetworks.com',

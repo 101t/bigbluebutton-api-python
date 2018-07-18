@@ -9,12 +9,12 @@ class MeetingInfo(Meeting):
         else:
             super().__init__(xml)
 
-        self.__internalMeetingId = xml.internalMeetingID
-        self.__recording = xml.recording == 'true' or xml.recording
-        self.__startTime = float(xml.startTime)
-        self.__endTime = float(xml.endTime)
-        self.__maxUsers = xml.maxUsers
-        self.__moderatorCount = xml.moderatorCount
+        self.__internalMeetingId = xml["internalMeetingID"]
+        self.__recording = xml["recording"] == 'true'
+        self.__startTime = float(xml["startTime"])
+        self.__endTime = float(xml["endTime"])
+        self.__maxUsers = xml["maxUsers"]
+        self.__moderatorCount = xml["moderatorCount"]
 
     def get_internal_meetingid(self):
         return self.__internalMeetingId

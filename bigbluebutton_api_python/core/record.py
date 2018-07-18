@@ -3,17 +3,18 @@ from .metaData import MetaData
 
 class Record:
     def __init__(self, xml):
-        self.__recordId = xml.recordID
-        self.__meetingId = xml.meetingID
-        self.__name = xml.name
-        self.__isPublished = xml.published == 'true' or xml.published
-        self.__state = xml.state
-        self.__startTime = xml.startTime
-        self.__endTime = xml.endTime
-        self.__playbackType = xml.playback.format.type
-        self.__playbackUrl = xml.playback.format.url
-        self.__playbackLength = xml.playback.format.length
-        self.meta = MetaData(xml.metadata)
+        self.__recordId = xml["recordID"]
+        self.__meetingId = xml["meetingID"]
+        self.__name = xml["name"]
+        self.__isPublished = xml["published"] == 'true'
+        self.__state = xml["state"]
+        self.__startTime = xml["startTime"]
+
+        self.__endTime = xml["endTime"]
+        self.__playbackType = xml["playback"]["format"]["type"]
+        self.__playbackUrl = xml["playback"]["format"]["url"]
+        self.__playbackLength = xml["playback"]["format"]["length"]
+        self.meta = MetaData(xml["metadata"])
 
     def get_recordid(self):
         return self.__recordId

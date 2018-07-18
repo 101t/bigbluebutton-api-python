@@ -2,23 +2,23 @@ from .metaData import MetaData
 
 class Meeting(object):
     def __init__(self, xml):
-        self.__meetingId = xml.meetingID
-        self.__meetingName = xml.meetingName
-        self.__creationTime = float(xml.createTime)
-        self.__creationDate = xml.createDate
-        self.__voiceBridge = xml.voiceBridge
-        self.__dialNumber = xml.dialNumber
-        self.__attendeePassword = xml.attendeePW
-        self.__moderatorPassword = xml.moderatorPW
-        self.__hasBeenForciblyEnded = xml.hasBeenForciblyEnded == 'true' or xml.hasBeenForciblyEnded
-        self.__isRunning = xml.running == 'true'
-        self.__participantCount = int(xml.participantCount)
-        self.__listenerCount = int(xml.listenerCount)
-        self.__voiceParticipantCount = int(xml.voiceParticipantCount)
-        self.__videoCount = int(xml.videoCount)
-        self.__duration = int(xml.duration)
-        self.__hasUserJoined = xml.hasUserJoined == 'true' or xml.hasUserJoined
-        self.__meta = MetaData(xml.metadata)
+        self.__meetingId = xml["meetingID"]
+        self.__meetingName = xml["meetingName"]
+        self.__creationTime = float(xml["createTime"])
+        self.__creationDate = xml["createDate"]
+        self.__voiceBridge = xml["voiceBridge"]
+        self.__dialNumber = xml["dialNumber"]
+        self.__attendeePassword = xml["attendeePW"]
+        self.__moderatorPassword = xml["moderatorPW"]
+        self.__hasBeenForciblyEnded = xml["hasBeenForciblyEnded"] == 'true'
+        self.__isRunning = xml["running"] == 'true'
+        self.__participantCount = int(xml["participantCount"])
+        self.__listenerCount = int(xml["listenerCount"])
+        self.__voiceParticipantCount = int(xml["voiceParticipantCount"])
+        self.__videoCount = int(xml["videoCount"])
+        self.__duration = int(xml["duration"])
+        self.__hasUserJoined = xml["hasUserJoined"] == 'true'
+        self.__meta = MetaData(xml["metadata"])
 
     def get_meetingid(self):
         return self.__meetingId

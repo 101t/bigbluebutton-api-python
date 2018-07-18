@@ -6,7 +6,14 @@ class GetRecordingsResponse(BaseResponse):
 
     def get_recordings(self):
         recordings = []
-        for recordXml in self.rawXml.recordings.getchildren():
+
+        try:
+            if self.get_message_key() == "noRecordings":
+                return []
+        except KeyError:
+            pass
+
+        for recordXml in self.get_field("recordings")["recording"]:
             recordings.append(Record(recordXml))
 
         return recordings
