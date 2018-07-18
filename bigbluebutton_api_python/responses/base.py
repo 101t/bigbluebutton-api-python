@@ -1,14 +1,6 @@
 
 import sys
 
-def recursive_dict(element):
-    if element.text == None and len(element.attrib):
-        return element.tag, element.attrib
-
-    return element.tag, \
-            dict(map(recursive_dict, element.getchildren())) or element.text
-
-
 if sys.version_info[0] == 2:
     from abc import ABCMeta
 
@@ -16,7 +8,7 @@ if sys.version_info[0] == 2:
         __metaclass__ = ABCMeta
 
         def __init__(self, rawXml):
-            dict.__init__(self, xml=recursive_dict(rawXml)[1])
+            dict.__init__(self, xml=rawXml)
             self.rawXml = rawXml
 
         def get_text(self, label):
@@ -35,7 +27,7 @@ else:
 
     class BaseResponse(ABC, dict):
         def __init__(self, rawXml):
-            dict.__init__(self, xml=recursive_dict(rawXml)[1])
+            dict.__init__(self, xml=rawXml)
             self.rawXml = rawXml
 
         def get_text(self, label):

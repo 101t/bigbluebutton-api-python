@@ -16,7 +16,7 @@ from .exception import BBBException
 from .util import UrlBuilder
 from .parameters import BBBModule
 import sys
-from lxml import objectify, etree
+from jxmlease import parse
 from hashlib import sha1
 if sys.version_info[0] == 2:
     from urllib import urlencode, urlopen
@@ -107,12 +107,13 @@ class BigBlueButton:
     # get default config.xml, if file_path is not given, this function will return response
     # as ElementTree.Element, otherwise it saves the response to the specific file path
     def get_default_config_xml(self, file_path=None):
-        response = self.__send_api_request(ApiMethod.GET_DEFAULT_CONFIG_XML)
+        url = self.__urlBuilder.buildUrl(ApiMethod.GET_DEFAULT_CONFIG_XML)
+        response = urlopen(url).read()
         if file_path is None:
             return response
         else:
             with open(file_path, 'w') as f:
-                f.write(etree.tostring(response).decode('utf-8'))
+                f.write(response.decode('utf-8'))
 
     def set_config_xml(self, meeting_id, xml):
         secret = ApiMethod.SET_CONFIG_XML + "configXML=" + quote(xml)
@@ -136,7 +137,7 @@ class BigBlueButton:
             response = urlopen(url, data=urlencode(data).encode()).read()
 
         try:
-            rawXml = objectify.fromstring(response)
+            rawXml = parse(response)["response"]
         except Exception as e:
             raise BBBException("XMLSyntaxError", e.message)
 
