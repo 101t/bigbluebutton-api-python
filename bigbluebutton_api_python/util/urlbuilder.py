@@ -2,13 +2,6 @@
 from hashlib import sha1
 from re import match
 
-import sys
-if sys.version_info[0] == 2:
-    from urllib import quote_plus
-else:
-    from urllib.request import quote_plus
-
-
 class UrlBuilder:
     def __init__(self, bbbServerBaseUrl, securitySalt):
         if not match('/[http|https]:\/\/[a-zA-Z1-9.]*\/bigbluebutton\/api\//', bbbServerBaseUrl):
@@ -29,7 +22,7 @@ class UrlBuilder:
                 value = "true" if value else "false"
             else:
                 value = str(value)
-            url += key + "=" + quote_plus(value) + "&"
+            url += key + "=" + value + "&"
 
         url += "checksum=" + self.__get_checksum(api_call, params)
         return url
@@ -41,7 +34,7 @@ class UrlBuilder:
                 value = "true" if value else "false"
             else:
                 value = str(value)
-            secret_str += key + "=" + quote_plus(value) + "&"
+            secret_str += key + "=" + value + "&"
         if secret_str.endswith("&"):
             secret_str = secret_str[:-1]
         secret_str += self.securitySalt

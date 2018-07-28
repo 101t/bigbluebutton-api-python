@@ -18,3 +18,18 @@ b = BigBlueButton('your BBB server url', 'your server credential')
 # get api version
 print(b.get_api_version().get_version())
 ```
+## Others Example
+```
+from bigbluebutton_api_python import BigBlueButton
+ b = BigBlueButton('your BBB server url', 'your server credential')
+#params
+dict = { 'moderatorPW':'pw' }
+#use create meeting
+print(b.create_meeting ('room',params=dict))
+#get info
+print(b.get_meeting_info('room'))
+#get url
+print(b.get_join_meeting_url('user','fake2', 'pw'))
+```
+More Docs [here](https://www.pydoc.io/pypi/bigbluebutton-api-python-0.0.2/autoapi/bigbluebutton/index.html).
+
