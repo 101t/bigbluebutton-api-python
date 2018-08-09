@@ -4,13 +4,13 @@ Python wrapper for BigBlueButton api, more information about BigBlueButton api c
 
 ## Installation
 The project has been uploaded to pypi, and you can view the library from [here](https://pypi.org/project/bigbluebutton-api-python/ 'pypi'). You can simply download the library by
-```
+```shell
 pip install bigbluebutton_api_python
 ```
 
 ## Example
 Example to use the library:
-```
+```python
 from bigbluebutton_api_python import BigBlueButton
 
 b = BigBlueButton('your BBB server url', 'your server credential')
@@ -19,7 +19,7 @@ b = BigBlueButton('your BBB server url', 'your server credential')
 print(b.get_api_version().get_version())
 ```
 ## Others Example
-```
+```python
 from bigbluebutton_api_python import BigBlueButton
  b = BigBlueButton('your BBB server url', 'your server credential')
 #params
