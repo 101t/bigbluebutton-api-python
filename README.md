@@ -19,9 +19,12 @@ b = BigBlueButton('your BBB server url', 'your server credential')
 print(b.get_api_version().get_version())
 ```
 ## Others Example
-```python
+
+```
 from bigbluebutton_api_python import BigBlueButton
- b = BigBlueButton('your BBB server url', 'your server credential')
+
+b = BigBlueButton('your BBB server url', 'your server credential')
+
 #params
 dict = { 'moderatorPW':'pw' }
 #use create meeting
