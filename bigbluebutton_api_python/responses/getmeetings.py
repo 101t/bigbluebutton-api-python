@@ -1,5 +1,6 @@
 from .base import BaseResponse
 from ..core.meeting import Meeting
+import jxmlease
 
 class GetMeetingsResponse(BaseResponse):
     def get_meetings(self):
@@ -11,6 +12,10 @@ class GetMeetingsResponse(BaseResponse):
         except KeyError:
             pass
 
-        for meetingXml in self.get_field("meetings")["meeting"]:
-            meetings.append(Meeting(meetingXml))
+        meetings_data = self.get_field("meetings")["meeting"]
+        if isinstance(meetings_data, jxmlease.dictnode.XMLDictNode):
+            meetings.append(Meeting(meetings_data))
+        else:
+            for meetingXml in self.get_field("meetings")["meeting"]:
+                meetings.append(Meeting(meetingXml))
         return meetings
