@@ -132,9 +132,9 @@ class BigBlueButton:
 
         # if data is none, then we send a GET request, if not, then we send a POST request
         if data is None:
-            response = urlopen(url).read()
+            response = urlopen(url, timeout=10).read()
         else:
-            response = urlopen(url, data=urlencode(data).encode()).read()
+            response = urlopen(url, timeout=10, data=urlencode(data).encode()).read()
 
         try:
             rawXml = parse(response)["response"]
