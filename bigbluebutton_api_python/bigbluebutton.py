@@ -25,6 +25,22 @@ else:
     from urllib.request import urlopen
     from urllib.parse import urlencode
     from urllib.request import quote
+    
+import xml.etree.ElementTree as ET
+
+from copy import copy
+
+def dictify(r,root=True):
+    if root:
+        return {r.tag : dictify(r, False)}
+    d=copy(r.attrib)
+    if r.text:
+        d["_text"]=r.text
+    for x in r.findall("./*"):
+        if x.tag not in d:
+            d[x.tag]=[]
+        d[x.tag].append(dictify(x,False))
+    return d
 
 
 class BigBlueButton:
@@ -42,7 +58,7 @@ class BigBlueButton:
             for key, val in meta.items():
                 params["meta_" + key] = val
         if slides and isinstance(slides, BBBModule):
-            response = self.__send_api_request(ApiMethod.CREATE, params, xml=slides.to_xml())
+            response = self.__send_api_request(ApiMethod.CREATE, params, dictify(ET.fromstring(slides.to_xml())))
         else:
             response = self.__send_api_request(ApiMethod.CREATE, params)
         return CreateMeetingResponse(response)
@@ -127,7 +143,7 @@ class BigBlueButton:
                                                                            "meetingID": meeting_id})
         return SetConfigXMLResponse(response)
 
-    def __send_api_request(self, api_call, params={}, data=None, xml=None):
+    def __send_api_request(self, api_call, params={}, data=None):
         url = self.__urlBuilder.buildUrl(api_call, params)
 
         # if data is none, then we send a GET request, if not, then we send a POST request
@@ -136,19 +152,16 @@ class BigBlueButton:
         else:
             response = urlopen(url, timeout=10, data=urlencode(data).encode()).read()
             
-        if xml:
-            rawXml = xml
-        else:
-            try:
-                rawXml = parse(response)["response"]
-            except Exception as e:
-                raise BBBException("XMLSyntaxError", e.message)
+        try:
+            rawXml = parse(response)["response"]
+        except Exception as e:
+            raise BBBException("XMLSyntaxError", e.message)
 
-            # get default config xml request will simply return the xml file without
-            # returncode, so it will cause an error when try to check the return code
-            if api_call != ApiMethod.GET_DEFAULT_CONFIG_XML:
-                if rawXml["returncode"] == "FAILED":
-                    raise BBBException(rawXml["messageKey"],
-                                       rawXml["message"])
+        # get default config xml request will simply return the xml file without
+        # returncode, so it will cause an error when try to check the return code
+        if api_call != ApiMethod.GET_DEFAULT_CONFIG_XML:
+            if rawXml["returncode"] == "FAILED":
+                raise BBBException(rawXml["messageKey"],
+                                   rawXml["message"])
 
         return rawXml
