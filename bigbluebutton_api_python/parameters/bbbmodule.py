@@ -46,6 +46,6 @@ class BBBModule:
                     xml += base64.encodestring(f.read())
                 xml += "</document>"
         
-        xml = "</module>"
+        xml += "</module>"
 
         return xml
