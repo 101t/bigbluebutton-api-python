@@ -25,22 +25,6 @@ else:
     from urllib.request import urlopen
     from urllib.parse import urlencode
     from urllib.request import quote
-    
-import xml.etree.ElementTree as ET
-
-from copy import copy
-
-def dictify(r,root=True):
-    if root:
-        return {r.tag : dictify(r, False)}
-    d=copy(r.attrib)
-    if r.text:
-        d["_text"]=r.text
-    for x in r.findall("./*"):
-        if x.tag not in d:
-            d[x.tag]=[]
-        d[x.tag].append(dictify(x,False))
-    return d
 
 
 class BigBlueButton:
@@ -58,7 +42,7 @@ class BigBlueButton:
             for key, val in meta.items():
                 params["meta_" + key] = val
         if slides and isinstance(slides, BBBModule):
-            response = self.__send_api_request(ApiMethod.CREATE, params, dictify(ET.fromstring(slides.to_xml())))
+            response = self.__send_api_request(ApiMethod.CREATE, params, slides.to_xml())
         else:
             response = self.__send_api_request(ApiMethod.CREATE, params)
         return CreateMeetingResponse(response)
