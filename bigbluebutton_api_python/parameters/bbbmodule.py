@@ -14,7 +14,7 @@ class BBBModule:
     def add_slide(self, type, value, name = None):
         if type == self.URL:
             self.__urls.append(value)
-        elif type == self.files:
+        elif type == self.FILE:
             self.__files.append(value)
         elif type == self.base64s:
             self.__base64s.append([name, value])
