@@ -45,5 +45,7 @@ class BBBModule:
                 with open(single_file, 'r') as f:
                     xml += base64.encodestring(f.read())
                 xml += "</document>"
+        
+        xml = "</module>"
 
         return xml
