@@ -19,13 +19,12 @@ import sys
 from jxmlease import parse
 from hashlib import sha1
 if sys.version_info[0] == 2:
-    from urllib import urlencode, urlopen
+    from urllib import urlencode, urlopen, Request
     from urllib import quote
 else:
-    from urllib.request import urlopen
+    from urllib.request import Request, urlopen
     from urllib.parse import urlencode
     from urllib.request import quote
-
 
 class BigBlueButton:
 
@@ -134,7 +133,11 @@ class BigBlueButton:
         if data is None:
             response = urlopen(url, timeout=10).read()
         else:
-            response = urlopen(url, timeout=10, data=urlencode(data).encode()).read()
+            if isinstance(data, str):
+                request = Request(url, data=bytes(data, "utf8"), headers={'Content-Type': 'application/xml'})
+                response = urlopen(request, timeout=10).read()
+            else:
+                response = urlopen(url, timeout=10, data=urlencode(data).encode()).read()
 
         try:
             rawXml = parse(response)["response"]
