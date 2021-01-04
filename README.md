@@ -8,6 +8,12 @@ The project has been uploaded to pypi, and you can view the library from [here](
 pip install bigbluebutton_api_python
 ```
 
+You can also install the latest from this repo with
+```shell
+pip install git+git://github.com/101t/bigbluebutton-api-python.git
+```
+
+
 ## Example
 Example to use the library:
 ```python
