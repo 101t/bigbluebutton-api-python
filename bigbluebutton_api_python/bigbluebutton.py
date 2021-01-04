@@ -19,8 +19,8 @@ import sys
 from jxmlease import parse
 from hashlib import sha1
 if sys.version_info[0] == 2:
-    from urllib import urlencode, urlopen, Request
-    from urllib import quote
+    from urllib2 import  urlopen ,Request
+    from urllib import quote,urlencode
 else:
     from urllib.request import Request, urlopen
     from urllib.parse import urlencode
