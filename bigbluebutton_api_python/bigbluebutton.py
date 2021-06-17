@@ -72,12 +72,7 @@ class BigBlueButton:
         response = self.__send_api_request(ApiMethod.GET_MEETINGS)
         return GetMeetingsResponse(response)
 
-    def get_recordings(self, meeting_id="", recording_id="", states=None, meta=None):
-        if states:
-            for state in states:
-                if state not in ["processing", "processed", "published", "unpublished", "deleted"]:
-                    raise BBBException("invalidRecordingState", "Invalid recording state given.")
-        params = {"meetingID": meeting_id, "recordID": recording_id}
+    def get_recordings(self, params={}, meta={}):
         if meta:
             for key, val in meta.items():
                 params["meta_" + key] = val
@@ -128,7 +123,7 @@ class BigBlueButton:
 
     def __send_api_request(self, api_call, params={}, data=None):
         url = self.__urlBuilder.buildUrl(api_call, params)
-
+        
         # if data is none, then we send a GET request, if not, then we send a POST request
         if data is None:
             response = urlopen(url, timeout=10).read()
