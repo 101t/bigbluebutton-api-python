@@ -1,18 +1,11 @@
 
 from hashlib import sha1
-from re import match
+from re import sub
 
 class UrlBuilder:
     def __init__(self, bbbServerBaseUrl, securitySalt):
-        if not match('/[http|https]:\/\/[a-zA-Z1-9.]*\/bigbluebutton\/api\//', bbbServerBaseUrl):
-            if not bbbServerBaseUrl.startswith("http://") and not bbbServerBaseUrl.startswith("https://"):
-                bbbServerBaseUrl = "http://" + bbbServerBaseUrl
-            if not bbbServerBaseUrl.endswith("/bigbluebutton/api/"):
-                bbbServerBaseUrl = bbbServerBaseUrl[:(bbbServerBaseUrl.find("/", 8)
-                    if bbbServerBaseUrl.find("/", 8) != -1 else len(bbbServerBaseUrl))] + "/bigbluebutton/api/"
-
-        self.securitySalt         = securitySalt
-        self.bbbServerBaseUrl     = bbbServerBaseUrl
+        self.bbbServerBaseUrl = sub('(\/api)?\/?$', '/api/', bbbServerBaseUrl, 1)
+        self.securitySalt = securitySalt
 
     def buildUrl(self, api_call, params={}):
         url = self.bbbServerBaseUrl
