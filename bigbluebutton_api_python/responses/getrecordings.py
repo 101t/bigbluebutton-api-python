@@ -1,5 +1,7 @@
 from .base import BaseResponse
 from ..core.record import Record
+import jxmlease
+
 
 
 class GetRecordingsResponse(BaseResponse):
@@ -12,8 +14,11 @@ class GetRecordingsResponse(BaseResponse):
                 return []
         except KeyError:
             pass
-
-        for recordXml in self.get_field("recordings")["recording"]:
-            recordings.append(Record(recordXml))
-
+            
+        recordings_data = self.get_field("recordings")["recording"]
+        if isinstance(recordings_data, jxmlease.dictnode.XMLDictNode):
+            recordings.append(Record(recordings_data))
+        else:
+            for recordingXml in self.get_field("recordings")["recording"]:
+                recordings.append(Record(recordingXml))           
         return recordings
