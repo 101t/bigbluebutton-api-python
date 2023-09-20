@@ -73,11 +73,8 @@ class BigBlueButton:
         response = self.__send_api_request(ApiMethod.GET_MEETINGS)
         return GetMeetingsResponse(response)
 
-    def get_recordings(self, params={}, meta={}):
-        if meta:
-            for key, val in meta.items():
-                params["meta_" + key] = val
-
+    def get_recordings(self, meeting_id):
+        params = {"meetingID": meeting_id}
         response = self.__send_api_request(ApiMethod.GET_RECORDINGS, params)
         return GetRecordingsResponse(response)
 
