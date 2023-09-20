@@ -11,6 +11,7 @@ from .responses import (
     PublishRecordingsResponse,
     SetConfigXMLResponse,
     UpdateRecordingsResponse,
+    GetAttendanceResponse
 )
 from .exception import BBBException
 from .util import UrlBuilder
@@ -98,6 +99,14 @@ class BigBlueButton:
         response = self.__send_api_request(ApiMethod.UPDATE_RECORDINGS, params)
         return UpdateRecordingsResponse(response)
 
+    def get_attendance(self, meeting_id, meta={}):
+        params = {"meetingID": meeting_id}
+        if meta != {}:
+            for key, val in meta.items():
+                params["meta_" + key] = val
+        response = self.__send_api_request(ApiMethod.GET_ATTENDANCE, params)
+        return GetAttendanceResponse(response)
+
     # get default config.xml, if file_path is not given, this function will return response
     # as ElementTree.Element, otherwise it saves the response to the specific file path
     def get_default_config_xml(self, file_path=None):
@@ -138,10 +147,9 @@ class BigBlueButton:
             rawXml = parse(response)["response"]
         except Exception as e:
             raise BBBException("XMLSyntaxError", e.message)
-
-        # get default config xml request will simply return the xml file without
+        # get default config xml and get attendance requests will simply return the xml file without
         # returncode, so it will cause an error when try to check the return code
-        if api_call != ApiMethod.GET_DEFAULT_CONFIG_XML:
+        if api_call not in (ApiMethod.GET_DEFAULT_CONFIG_XML, ApiMethod.GET_ATTENDANCE):
             if rawXml["returncode"] == "FAILED":
                 raise BBBException(rawXml["messageKey"],
                                    rawXml["message"])

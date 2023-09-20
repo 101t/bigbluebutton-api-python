@@ -10,3 +10,4 @@ from .ismeetingrunning import IsMeetingRunningResponse
 from .publishrecordings import PublishRecordingsResponse
 from .setconfigxml import SetConfigXMLResponse
 from .updaterecordings import UpdateRecordingsResponse
+from .getattendance import GetAttendanceResponse

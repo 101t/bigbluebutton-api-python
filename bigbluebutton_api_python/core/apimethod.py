@@ -17,6 +17,7 @@ if sys.version_info[0] == 2:
         PUBLISH_RECORDINGS     = 'publishRecordings'
         DELETE_RECORDINGS      = 'deleteRecordings'
         UPDATE_RECORDINGS      = 'updateRecordings'
+        GET_ATTENDANCE         = 'getAttendance'
 
 else:
     "3.x"
@@ -34,4 +35,4 @@ else:
         GET_RECORDINGS         = 'getRecordings'
         PUBLISH_RECORDINGS     = 'publishRecordings'
         DELETE_RECORDINGS      = 'deleteRecordings'
-        UPDATE_RECORDINGS      = 'updateRecordings'
+        GET_ATTENDANCE         = 'getAttendance'
