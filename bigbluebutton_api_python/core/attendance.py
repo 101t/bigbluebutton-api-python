@@ -5,7 +5,8 @@ class Attendance:
         self.__startTime = xml["createdOn"]
         self.__endTime = xml["endedOn"]
         self.__users = {}
-        self.set_users(xml)
+        if xml.get("users", []):
+            self.set_users(xml)
 
     def set_users(self, xml):
         for user in xml["users"]:
