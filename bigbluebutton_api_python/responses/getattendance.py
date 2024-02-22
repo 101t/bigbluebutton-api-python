@@ -10,6 +10,9 @@ class GetAttendanceResponse(BaseResponse):
             super().__init__(xml)
     def get_attendance(self):
         attendances = []
-        for meeting in self.get_field("meetings")["meeting"]:
+        meetings = self.get_field("meetings")["meeting"]
+        if type(meetings) != list:
+            meetings = [meetings]
+        for meeting in list(self.get_field("meetings")["meeting"]):
             attendances.append(Attendance(xml=meeting))
         return attendances
