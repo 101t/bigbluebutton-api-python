@@ -13,6 +13,6 @@ class GetAttendanceResponse(BaseResponse):
         meetings = self.get_field("meetings")["meeting"]
         if type(meetings) != list:
             meetings = [meetings]
-        for meeting in list(self.get_field("meetings")["meeting"]):
+        for meeting in meetings:
             attendances.append(Attendance(xml=meeting))
         return attendances
