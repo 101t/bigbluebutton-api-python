@@ -127,6 +127,13 @@ class BigBlueButton:
                                                                            "meetingID": meeting_id})
         return SetConfigXMLResponse(response)
 
+    def _parse_response(self, response):
+        # parse response to json if json else parse as xml
+        try:
+            return json.loads(response)
+        except:
+            return parse(response)
+
     def __send_api_request(self, api_call, params={}, data=None):
         url = self.__urlBuilder.buildUrl(api_call, params)
         
@@ -141,7 +148,7 @@ class BigBlueButton:
                 response = urlopen(url, timeout=10, data=urlencode(data).encode()).read()
 
         try:
-            rawXml = parse(response)["response"]
+            rawXml = self._parse_response(response)["response"]
         except Exception as e:
             raise BBBException("XMLSyntaxError", e.message)
         # get default config xml and get attendance requests will simply return the xml file without
