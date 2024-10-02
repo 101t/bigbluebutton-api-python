@@ -17,6 +17,7 @@ from .exception import BBBException
 from .util import UrlBuilder
 from .parameters import BBBModule
 import sys
+import json
 from jxmlease import parse
 from hashlib import sha1
 if sys.version_info[0] == 2:
@@ -127,23 +128,33 @@ class BigBlueButton:
                                                                            "meetingID": meeting_id})
         return SetConfigXMLResponse(response)
 
+    def _parse_response(self, response):
+        # parse response to the correct form
+        content_type = response.getheader('Content-Type')
+        response = response.read()
+        match content_type:
+            case "application/json":
+                return json.loads(response)["response"]
+            case _:
+                try:
+                    return parse(response)["response"]
+                except Exception as e:
+                    raise BBBException("XMLSyntaxError", e)
+
     def __send_api_request(self, api_call, params={}, data=None):
         url = self.__urlBuilder.buildUrl(api_call, params)
         
         # if data is none, then we send a GET request, if not, then we send a POST request
         if data is None:
-            response = urlopen(url, timeout=10).read()
+            response = urlopen(url, timeout=10)
         else:
             if isinstance(data, str):
                 request = Request(url, data=bytes(data, "utf8"), headers={'Content-Type': 'application/xml'})
-                response = urlopen(request, timeout=10).read()
+                response = urlopen(request, timeout=10)
             else:
-                response = urlopen(url, timeout=10, data=urlencode(data).encode()).read()
+                response = urlopen(url, timeout=10, data=urlencode(data).encode())
 
-        try:
-            rawXml = parse(response)["response"]
-        except Exception as e:
-            raise BBBException("XMLSyntaxError", e.message)
+        rawXml = self._parse_response(response)
         # get default config xml and get attendance requests will simply return the xml file without
         # returncode, so it will cause an error when try to check the return code
         if api_call not in (ApiMethod.GET_DEFAULT_CONFIG_XML, ApiMethod.GET_ATTENDANCE):
